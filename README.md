@@ -1,3 +1,4 @@
-= hoptoad_server_v2
+# Hoptoad Server v2 for Redmine
 
-Description goes here
+An implementation of the Hoptoad protocol for Redmine which allows you to receive bugs within Redmine.
+Inspired by and loosely based on https://github.com/yeah/redmine_hoptoad_server
