@@ -34,7 +34,7 @@ class HoptoadController < ApplicationController
   private
 
   # The automagic XML parsing by Rails ignores the text elements
-  # This method replaces the garbled elements by new arrays of hashes
+  # This method replaces the garbled elements with new hashes
   def restore_var_elements(original_xml)
     doc = Hpricot::XML(request.body)
     
