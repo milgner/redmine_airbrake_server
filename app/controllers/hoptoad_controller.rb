@@ -44,7 +44,7 @@ class HoptoadController < ApplicationController
     issue.category = settings[:category]
     issue.assigned_to = settings[:assigned_to]
     issue.priority_id = settings[:priority]
-    issue.description = build_description(notice)
+    issue.description = build_description(notice, settings)
     issue.status = issue_status_open
     issue.save!
   end
@@ -57,13 +57,18 @@ class HoptoadController < ApplicationController
     IssueStatus.find(:first, :conditions => {:is_default => true}, :order => 'position ASC')
   end
   
-  def build_description(notice)
-    error = "The Hoptoad notifier reported an error: #{notice['error']['message']}\n\n"
-    error << "Backtrace:\n\nbq. "
+  def build_description(notice, settings)
+    error = "The Hoptoad notifier reported an error: <pre>#{notice['error']['message']}</pre>\n\n"
+    error << "Backtrace:\n\np((. "
     notice['error']['backtrace']['line'].each do |element|
-      error << "#{element['method']} in source:#{element['file']}#L#{element['number']}\n"
+      if (settings[:project].repository && element['file'].start_with?('[PROJECT_ROOT]') )
+        error << "source:\"#{element['file'][14..-1]}#L#{element['number']}\" in ??<notextile>#{element['method']}</notextile>??"
+      else
+        error << "@#{element['file']}:#{element['number']}@ in ??<notextile>#{element['method']}</notextile>??"
+      end
+      error << "\r\n"
     end
-    error << "\n"
+    error
   end
   
   def short_error_info(notice)
