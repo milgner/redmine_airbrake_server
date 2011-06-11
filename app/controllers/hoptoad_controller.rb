@@ -1,8 +1,9 @@
 require 'hpricot'
 
 class HoptoadController < ApplicationController
+  skip_before_filter :check_if_login_required
   before_filter :find_or_create_custom_fields
-  
+
   unloadable
   
   def index
