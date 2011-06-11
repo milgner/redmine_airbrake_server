@@ -1,0 +1,47 @@
+h3. <%= @notice['error']['message'] %>
+
+h4. Backtrace:
+
+p((. <% @notice['error']['backtrace']['line'].each do |element|
+  if (element['file'].start_with?('[PROJECT_ROOT]') && @settings[:project].repository && @settings[:project].repository.entry(element['file'][14..-1])) # don't create source link if the file isn't in the repository
+    %>source:"<%= element['file'][14..-1] %>#L<%= element['number'] %>" in ??<notextile><%= element['method'] %></notextile>??<%
+  else
+    %>@<%=element['file']%>:<%=element['number']%>@ in ??<notextile><%=element['method']%></notextile>??<%
+  end %>
+<% end %>
+
+<% unless @notice['request'].empty? %>
+h4. Request:
+
+p((. URL: <%= @notice['request']['url'] %>
+Component: <%= @notice['request']['component']%>
+Action: <%= @notice['request']['action'] %>
+
+<% def explode_vars(vars)
+     result = "|_.Key|_.Value|\n"
+     vars.each_pair do |key, value|
+	   result << "|#{key}|#{value}|\n"
+     end
+     result
+   end
+
+   unless (@notice['request']['params'].empty?) %>
+h4. Parameters: 
+
+<%= explode_vars(@notice['request']['params']) %>
+<% end %>
+
+<% # remove the 'true ||' bit if you want to save headers
+   unless true || (@notice['request']['cgi_data'].empty?) %>
+h4. Headers:
+
+<%= explode_vars(@notice['request']['cgi_data']) %>
+<% end %>
+<% unless (@notice['request']['session'].empty?) %>
+h4. Session:
+
+<%= explode_vars(@notice['request']['session']) %>
+<% end %>
+
+
+<% end %>
