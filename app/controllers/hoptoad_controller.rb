@@ -7,7 +7,7 @@ class HoptoadController < ApplicationController
   unloadable
   
   def index
-    redirect_to root_path unless request.post? && !params[:notice].empty?
+    redirect_to root_path unless request.post? && !params[:notice].nil?
     @notice = params[:notice]
     if (@notice['version'] != "2.0")
       logger.warn("Expected Hoptoad notice version 2.0 but got #{@notice['version']}. You should consider filing an enhancement request or updating the plugin.")
@@ -16,7 +16,7 @@ class HoptoadController < ApplicationController
     restore_var_elements(request.body)
     
     redmine_params = YAML.load(@notice['api_key'])
-    raise ArgumentError.new("Invalid API key") unless Setting.mail_handler_api_key == redmine_params[:api_key]
+    raise ArgumentError.new("Invalid API key #{Setting.mail_handler_api_key} != #{redmine_params[:api_key]}") unless Setting.mail_handler_api_key == redmine_params[:api_key]
 
     read_settings(redmine_params)
 
@@ -39,16 +39,22 @@ class HoptoadController < ApplicationController
   def restore_var_elements(original_xml)
     doc = Hpricot::XML(request.body)
     
-    request_params = convert_var_elements(doc/'/notice/request/params/var')
-    request_params.delete('action') # already known
-    request_params.delete('controller') # already known    
-    @notice['request']['params'] = request_params
+    unless @notice['request']['params'].nil?
+      request_params = convert_var_elements(doc/'/notice/request/params/var')
+      request_params.delete('action') # already known
+      request_params.delete('controller') # already known    
+      @notice['request']['params'] = request_params
+    end
     
-    cgi_data = convert_var_elements(doc/'notice/request/cgi-data/var')
-    @notice['request']['cgi_data'] = cgi_data
+    unless @notice['request']['cgi_data'].nil?
+      cgi_data = convert_var_elements(doc/'notice/request/cgi-data/var')
+      @notice['request']['cgi_data'] = cgi_data
+    end
     
-    session_vars = convert_var_elements(doc/'/notice/request/session/var')
-    @notice['request']['session'] = session_vars
+    unless @notice['request']['session'].nil?
+      session_vars = convert_var_elements(doc/'/notice/request/session/var')
+      @notice['request']['session'] = session_vars
+    end
   end
   
   def convert_var_elements(elements)

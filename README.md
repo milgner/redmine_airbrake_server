@@ -7,7 +7,7 @@ Inspired by and loosely based on the [v1 Hoptoad server by Jan Schulz-Hofen](htt
 ## Installation
 
 Install the hpricot gem, then install the plugin into Redmine [as usual](http://www.redmine.org/projects/redmine/wiki/Plugins).
-Now go to _Administration -> Settings -> Incoming emails_ and, if neccessary, check the box _Enable WS for incoming emails_ and generate and API key. This is the key you will need in the next step to configure your notifier.
+Now go to _Administration -> Settings -> Incoming emails_ and, if neccessary, check the box _Enable WS for incoming emails_ and generate an API key. This is the key you will need in the next step to configure your notifier.
 
 
 ## Client-Configuration

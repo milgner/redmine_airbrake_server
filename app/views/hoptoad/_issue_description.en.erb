@@ -10,7 +10,7 @@ p((. <% @notice['error']['backtrace']['line'].each do |element|
   end %>
 <% end %>
 
-<% unless @notice['request'].empty? %>
+<% unless @notice['request'].nil? %>
 h4. Request:
 
 p((. URL: <%= @notice['request']['url'] %>
@@ -25,19 +25,19 @@ Action: <%= @notice['request']['action'] %>
      result
    end
 
-   unless (@notice['request']['params'].empty?) %>
+   unless (@notice['request']['params'].nil?) %>
 h4. Parameters: 
 
 <%= explode_vars(@notice['request']['params']) %>
 <% end %>
 
 <% # remove the 'true ||' bit if you want to save headers
-   unless true || (@notice['request']['cgi_data'].empty?) %>
+   unless true || (@notice['request']['cgi_data'].nil?) %>
 h4. Headers:
 
 <%= explode_vars(@notice['request']['cgi_data']) %>
 <% end %>
-<% unless (@notice['request']['session'].empty?) %>
+<% unless (@notice['request']['session'].nil?) %>
 h4. Session:
 
 <%= explode_vars(@notice['request']['session']) %>
