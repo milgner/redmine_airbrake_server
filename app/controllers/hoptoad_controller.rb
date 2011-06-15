@@ -37,6 +37,8 @@ class HoptoadController < ApplicationController
   # The automagic XML parsing by Rails ignores the text elements
   # This method replaces the garbled elements with new hashes
   def restore_var_elements(original_xml)
+    return if @notice['request'].nil?
+    
     doc = Hpricot::XML(request.body)
     
     unless @notice['request']['params'].nil?
@@ -113,9 +115,15 @@ class HoptoadController < ApplicationController
    
   def build_subject
     error_class = @notice['error']['class']
-    file = @notice['error']['backtrace']['line'].first()['file']
-    line = @notice['error']['backtrace']['line'].first()['number']
-    "[Hoptoad] #{error_class} in #{file}:#{line}"
+    # if there's only one line, it gets parsed into a hash instead of an array
+    if @notice['error']['backtrace']['line'].is_a? Hash
+      file = @notice['error']['backtrace']['line']['file']
+      line = @notice['error']['backtrace']['line']['number']
+    else
+      file = @notice['error']['backtrace']['line'].first()['file']
+      line = @notice['error']['backtrace']['line'].first()['number']
+    end
+    "[Hoptoad] #{error_class} in #{file}:#{line}"[0..254]
   end
   
   def find_or_create_custom_fields

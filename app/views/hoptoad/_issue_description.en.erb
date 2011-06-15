@@ -1,5 +1,6 @@
 h3. <%= @notice['error']['message'] %>
 
+<% if @notice['error']['backtrace'].is_a? Array %>
 h4. Backtrace:
 
 p((. <% @notice['error']['backtrace']['line'].each do |element|
@@ -9,7 +10,7 @@ p((. <% @notice['error']['backtrace']['line'].each do |element|
     %>@<%=element['file']%>:<%=element['number']%>@ in ??<notextile><%=element['method']%></notextile>??<%
   end %>
 <% end %>
-
+<% end %>
 <% unless @notice['request'].nil? %>
 h4. Request:
 
@@ -42,6 +43,5 @@ h4. Session:
 
 <%= explode_vars(@notice['request']['session']) %>
 <% end %>
-
 
 <% end %>
