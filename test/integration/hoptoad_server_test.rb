@@ -1,6 +1,8 @@
 require File.expand_path('../../test_helper', __FILE__)
 
 class HoptoadServerTest < ActionController::IntegrationTest
+  NOTIFIER_URL = '/notifier_api/v2/notices/'
+  
   fixtures :projects, :versions, :users, :trackers, :projects_trackers, :issue_statuses, :enabled_modules, :enumerations
 
   @@xml_notice_data = <<EOF
@@ -49,9 +51,7 @@ EOF
   end
    
   def test_create_new_issues
-    post('/notifier_api/v2/notices/',@@xml_notice_data, {"Content-type" => "text/xml"})
-    assert_response :success
-    i = Issue.find :last
+    i = post_and_find_issue
     assert_equal '[Hoptoad] RuntimeError in /testapp/app/models/user.rb:53', i.subject
     assert i.description.include?("RuntimeError: I've made a huge mistake")
     assert i.description.include?("/testapp/app/controllers/users_controller.rb")
@@ -60,15 +60,18 @@ EOF
   end
   
   def test_increase_occurrences_for_existing_issues
-    post('/notifier_api/v2/notices/', @@xml_notice_data, {"Content-type" => "text/xml"})
-    assert_response :success
-    i = Issue.find :last
+    i = post_and_find_issue
     assert_equal "1", i.custom_value_for(IssueCustomField.find_by_name('# Occurrences').id).value
-    post('/notifier_api/v2/notices/', @@xml_notice_data, {"Content-type" => "text/xml"})
-    assert_response :success
-    i2 = Issue.find:last
+    i2 = post_and_find_issue
     assert_equal i, i2
     assert_equal "2", i2.custom_value_for(IssueCustomField.find_by_name('# Occurrences').id).value
   end
-  
+
+  private
+
+  def post_and_find_issue
+    post(NOTIFIER_URL, @@xml_notice_data, {"Content-type" => "text/xml"})
+    assert_response :success
+    Issue.find :last
+  end
 end

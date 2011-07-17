@@ -1,6 +1,6 @@
 h3. <%= @notice['error']['message'] %>
 
-<% if @notice['error']['backtrace'].is_a? Array %>
+<% if @notice['error']['backtrace']['line'].is_a?(Array) %>
 h4. Backtrace:
 
 p((. <% @notice['error']['backtrace']['line'].each do |element|
