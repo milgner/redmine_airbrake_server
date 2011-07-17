@@ -1,6 +1,6 @@
 require 'hpricot'
 
-class HoptoadController < ApplicationController
+class AirbrakeController < ApplicationController
   skip_before_filter :check_if_login_required
   before_filter :find_or_create_custom_fields
 
@@ -10,7 +10,7 @@ class HoptoadController < ApplicationController
     redirect_to root_path unless request.post? && !params[:notice].nil?
     @notice = params[:notice]
     if (@notice['version'] != "2.0")
-      logger.warn("Expected Hoptoad notice version 2.0 but got #{@notice['version']}. You should consider filing an enhancement request or updating the plugin.")
+      logger.warn("Expected Airbrake notice version 2.0 but got #{@notice['version']}. You should consider filing an enhancement request or updating the plugin.")
     end
 
     restore_var_elements(request.body)
@@ -73,6 +73,8 @@ class HoptoadController < ApplicationController
     @settings[:tracker] = @settings[:project].trackers.find_by_name(params[:tracker]) or raise ArgumentError.new("tracker #{params[:tracker]} not found in project #{params[:project]}")
     check_custom_field_assignments
     # these are optional
+    @settings[:author] = params[:login].nil? ? User.anonymous : User.find_by_login(params[:login])
+    @settings[:reopen_strategy] = params[:reopen] || 'always'
     @settings[:category] = IssueCategory.find_by_name(params[:category]) unless params[:category].blank?
     @settings[:assigned_to] = User.find_by_login(params[:assigned_to]) unless params[:assigned_to].blank?
     @settings[:priority] = params[:priority] unless params[:priority].blank?
@@ -80,13 +82,13 @@ class HoptoadController < ApplicationController
   
   def create_new_issue
     @issue = Issue.new
-    @issue.author = User.anonymous
+    @issue.author = @settings[:author]
     @issue.subject = build_subject
     @issue.tracker = @settings[:tracker]
     @issue.project = @settings[:project]
     @issue.category = @settings[:category]
     @issue.assigned_to = @settings[:assigned_to]
-    @issue.priority_id = @settings[:priority]
+    @issue.priority_id = @settings[:priority] unless @settings[:priority].nil?
     @issue.description = render_to_string(:partial => 'issue_description')
     @issue.status = issue_status_open
     @issue.custom_values.build(:custom_field => @occurrences_field, :value => '1')
@@ -103,7 +105,11 @@ class HoptoadController < ApplicationController
   end
   
   def update_existing_issue
-    @issue.status = issue_status_open if @issue.status.is_closed?
+    environment_name = @notice['server_environment']['environment_name']
+    if (['always', environment_name].include?(@settings[:reopen_strategy]))
+      @issue.status = issue_status_open if @issue.status.is_closed?
+      @issue.init_journal(@settings[:author], "h4. Issue reopened after occurring again in #{environment_name} environment")
+    end
     number_occurrences = @issue.custom_value_for(@occurrences_field.id).value
     @issue.custom_field_values = { @occurrences_field.id => (number_occurrences.to_i+1).to_s }
     @issue.save!
@@ -123,7 +129,7 @@ class HoptoadController < ApplicationController
       file = @notice['error']['backtrace']['line'].first()['file']
       line = @notice['error']['backtrace']['line'].first()['number']
     end
-    "[Hoptoad] #{error_class} in #{file}:#{line}"[0..254]
+    "[Airbrake] #{error_class} in #{file}:#{line}"[0..254]
   end
   
   def find_or_create_custom_fields

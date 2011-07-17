@@ -1,7 +1,7 @@
-# Hoptoad Server v2 for Redmine
+# Airbrake Server for Redmine
 
-An implementation of the Hoptoad protocol v2 for Redmine which automatically creates issues from notices submitted via Hoptoad notifiers.
-Inspired by and loosely based on the [v1 Hoptoad server by Jan Schulz-Hofen](https://github.com/yeah/redmine_hoptoad_server)
+An implementation of the [Airbrake](http://airbrakeapp.com) (formerly known as Hoptoad) protocol v2 for Redmine which automatically creates issues from notices submitted from your applications notifier.
+Inspired by and loosely based on the [Hoptoad server by Jan Schulz-Hofen](https://github.com/yeah/redmine_hoptoad_server)
 
 
 ## Installation
@@ -20,6 +20,8 @@ For a Rails application, just setup the Hoptoad notifier as usual, then modify `
 	                    :api_key => 'redmine_api_key',               # the key you generated in the previous step
 	                    :category => 'Development',                  # the name of a ticket category (optional.)
 	                    :assigned_to => 'admin',                     # the login of a user the ticket should get assigned to by default (optional.)
+	                    :login => 'airbrake',                        # the login who should be displayed as author of the tickets. Defaults to anonymous.
+	                    :reopen => 'production',                     # will only reopen if the error occurs on the specified environment. Defaults to all, optional.
 	                    :priority => 5                               # the default priority (use id instead of name, optional.)
 	                   }.to_yaml
 	  config.host = 'my_redmine_host.com'                            # the hostname your Redmine runs at
@@ -28,7 +30,7 @@ For a Rails application, just setup the Hoptoad notifier as usual, then modify `
 	end
 
 That's it. You may run `rake hoptoad:test` to generate a test issue.
-If it doesn't work, check your logs and configuration, then [submit an issue on Github](https://github.com/milgner/redmine_hoptoad_server_v2/issues)
+If it doesn't work, check your logs and configuration, then [submit an issue on Github](https://github.com/milgner/redmine_airbrake_server/issues)
 
 
 ## License
@@ -40,4 +42,4 @@ This plugin is licensed under the [Apache license 2.0](http://www.apache.org/lic
 
 Written by Marcus Ilgner (mail@marcusilgner.com)
 
-[![Flattr this](http://api.flattr.com/button/flattr-badge-large.png)](http://flattr.com/thing/307397/Hoptoad-server-plugin-for-the-Redmine-issue-tracker)
+[![Flattr this](http://api.flattr.com/button/flattr-badge-large.png)](http://flattr.com/thing/307397/Airbrake-server-plugin-for-the-Redmine-issue-tracker)
