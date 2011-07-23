@@ -73,7 +73,7 @@ class AirbrakeController < ApplicationController
     @settings[:tracker] = @settings[:project].trackers.find_by_name(params[:tracker]) or raise ArgumentError.new("tracker #{params[:tracker]} not found in project #{params[:project]}")
     check_custom_field_assignments
     # these are optional
-    @settings[:author] = params[:login].nil? ? User.anonymous : User.find_by_login(params[:login])
+    @settings[:author] = params[:login].nil? ? User.anonymous : (User.find_by_login(params[:login])||User.anonymous)
     @settings[:reopen_strategy] = params[:reopen] || 'always'
     @settings[:category] = IssueCategory.find_by_name(params[:category]) unless params[:category].blank?
     @settings[:assigned_to] = User.find_by_login(params[:assigned_to]) unless params[:assigned_to].blank?
