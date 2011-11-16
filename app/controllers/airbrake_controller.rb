@@ -78,6 +78,7 @@ class AirbrakeController < ApplicationController
     @settings[:category] = IssueCategory.find_by_name(params[:category]) unless params[:category].blank?
     @settings[:assigned_to] = User.find_by_login(params[:assigned_to]) unless params[:assigned_to].blank?
     @settings[:priority] = params[:priority] unless params[:priority].blank?
+    @settings[:fixed_version] = params[:fixed_version] unless params[:fixed_version].blank?
   end
   
   def create_new_issue
@@ -87,6 +88,7 @@ class AirbrakeController < ApplicationController
     @issue.tracker = @settings[:tracker]
     @issue.project = @settings[:project]
     @issue.category = @settings[:category]
+    @issue.fixed_version_id = @settings[:fixed_version]
     @issue.assigned_to = @settings[:assigned_to]
     @issue.priority_id = @settings[:priority] unless @settings[:priority].nil?
     @issue.description = render_to_string(:partial => 'issue_description')
