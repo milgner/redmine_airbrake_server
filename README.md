@@ -19,7 +19,7 @@ For a Rails application, just setup the Hoptoad notifier as usual, then modify `
 	                    :tracker => 'Bug',                           # the name of your desired tracker
 	                    :api_key => 'redmine_api_key',               # the key you generated in the previous step
 	                    :category => 'Development',                  # the name of a ticket category (optional.)
-                      :fixed_version => '25'                       # the default version (use is instead of name, optional.)
+                      	:fixed_version => 25,                        # the default version (use id instead of name, optional.)
 	                    :assigned_to => 'admin',                     # the login of a user the ticket should get assigned to by default (optional.)
 	                    :login => 'airbrake',                        # the login who should be displayed as author of the tickets. Defaults to anonymous.
 	                    :reopen => 'production',                     # will only reopen if the error occurs on the specified environment. Defaults to all, optional.

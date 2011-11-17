@@ -8,7 +8,7 @@ class AirbrakeServerTest < ActionController::IntegrationTest
   @@xml_notice_data = <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <notice version="2.0">
-  <api-key>--- \n:assigned_to: marcus\n:api_key: "1234567890"\n:tracker: Bug\n:project: ecookbook\n:category: Development\n:login: jsmith\n</api-key>
+  <api-key>--- \n:tracker: Bug\n:priority: 5\n:fixed_version: 3\n:assigned_to: someone\n:category: Development\n:api_key: "1234567890"\n:login: jsmith\n:project: ecookbook\n</api-key>
   <notifier>
     <name>Airbrake Notifier</name>
     <version>1.2.4</version>
@@ -58,6 +58,7 @@ EOF
     assert_equal "production", i.custom_value_for(IssueCustomField.find_by_name('Environment')).value
     assert_equal "1.0.0", i.custom_value_for(IssueCustomField.find_by_name('Version')).value
     assert_equal 'jsmith', i.author.login
+    assert_equal 3, i.fixed_version_id
   end
   
   def test_increase_occurrences_for_existing_issues
