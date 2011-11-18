@@ -12,7 +12,7 @@ Now go to _Administration -> Settings -> Incoming emails_ and, if neccessary, ch
 
 ## Client-Configuration
 
-For a Rails application, just setup the Hoptoad notifier as usual, then modify `config/initializers/hoptoad.rb` according to your needs using this template:
+For a Rails application, just setup the [Airbrake notifier](https://github.com/airbrake/airbrake) as usual, then modify `config/initializers/airbrake.rb` according to your needs using this template:
 
 	HoptoadNotifier.configure do |config|
 	  config.api_key = {:project => 'redmine_project_identifier',    # the identifier you specified for your project in Redmine
@@ -30,7 +30,7 @@ For a Rails application, just setup the Hoptoad notifier as usual, then modify `
 	  config.secure = true                                           # sends data to your server via SSL (optional.)
 	end
 
-That's it. You may run `rake hoptoad:test` to generate a test issue.
+That's it. You may run `rake airbrake:test` to generate a test issue.
 If it doesn't work, check your logs and configuration, then [submit an issue on Github](https://github.com/milgner/redmine_airbrake_server/issues)
 
 
