@@ -1,0 +1,11 @@
+en:
+  airbrake:
+    heading: Airbrake Server
+    label: Airbrake Server
+    fixed_version: Default target version
+    category: Default issue category
+    assign_to: Assign new tickets to user
+    author: Author for new tickets
+    priority: Priority for new tickets
+    tracker: Tracker for new tickets
+    reopen_strategy: Don't reopen tickets belonging to environment

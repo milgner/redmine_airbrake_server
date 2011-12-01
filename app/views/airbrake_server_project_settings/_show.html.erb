@@ -1,0 +1,38 @@
+<%
+  @settings = AirbrakeServerProjectSettings.find_or_create(@project)
+%>
+<% form_for :settings, :url => { :controller => 'airbrake_server_project_settings', :action => 'update' } do |f| -%>
+<%= hidden_field_tag 'project_id', @project.id %>
+<table>
+	<tr>
+		<td><%= f.label 'author_id', l('airbrake.author') %></td>
+		<td><%= f.select 'author_id', @project.members.collect {|u| [ u.name, u.id ] }, {:include_blank => false} %></td>
+	</tr>
+	<tr>
+		<td><%= f.label 'assign_to_id', l('airbrake.assign_to') %></td>
+		<td><%= f.select 'assign_to_id', @project.members.collect{|u| [ u.name, u.id ]}, {:include_blank => true} %></td>
+	</tr>
+	<tr>
+		<td><%= f.label 'priority_id', l('airbrake.priority') %></td>
+		<td><%= f.select 'priority_id', IssuePriority.all.collect{|ip| [ip.name, ip.id]} %></td>
+	</tr>
+	<tr>
+		<td><%= f.label 'tracker_id', l('airbrake.tracker') %></td>
+		<td><%= f.select 'tracker_id', @project.trackers.collect{|t| [t.name, t.id]} %></td>
+	</tr>
+	<tr>
+		<td><%= f.label 'reopen_strategy', l('airbrake.reopen_strategy') %></td>
+		<td><%= f.text_field 'reopen_strategy', {:size => 20} %></td>
+	</tr>
+	<tr>
+		<td><%= f.label 'fixed_version_id', l('airbrake.fixed_version')%></td>
+		<td><%= f.select 'fixed_version_id', @project.versions.collect{|v| [v.name, v.id]} %></td>
+	</tr>
+	<tr>
+		<td><%= f.label 'category_id', l('airbrake.category')%></td>
+		<td><%= f.select 'category_id', @project.issue_categories.all.collect{|ic| [ic.name, ic.id]} %></td>
+	</tr>
+</table>
+<div><%= f.submit t('button_save') %></div>
+
+<% end -%>

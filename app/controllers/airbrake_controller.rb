@@ -68,17 +68,29 @@ class AirbrakeController < ApplicationController
   end
   
   def read_settings(params)
+    project = Project.find_by_identifier(params[:project]) or raise ArgumentError.new("invalid project #{params[:project]}")
     @settings = {}
-    @settings[:project] = Project.find_by_identifier(params[:project]) or raise ArgumentError.new("invalid project #{params[:project]}")
-    @settings[:tracker] = @settings[:project].trackers.find_by_name(params[:tracker]) or raise ArgumentError.new("tracker #{params[:tracker]} not found in project #{params[:project]}")
-    check_custom_field_assignments
+    @settings[:project] = project
+    @settings[:tracker] = project.trackers.find_by_name(params[:tracker]) if params.has_key?(:tracker)
     # these are optional
-    @settings[:author] = params[:login].nil? ? User.anonymous : (User.find_by_login(params[:login])||User.anonymous)
-    @settings[:reopen_strategy] = params[:reopen] || 'always'
-    @settings[:category] = IssueCategory.find_by_name(params[:category]) unless params[:category].blank?
-    @settings[:assigned_to] = User.find_by_login(params[:assigned_to]) unless params[:assigned_to].blank?
-    @settings[:priority] = params[:priority] unless params[:priority].blank?
-    @settings[:fixed_version] = params[:fixed_version] unless params[:fixed_version].blank?
+    [:reopen_strategy, :fixed_version_id].each do |key|
+      @settings[key] = params[key] if params.has_key?(key)
+    end
+    @settings[:priority] = IssuePriority.find_by_id(params[:priority]) if params.has_key?(:priority)
+    @settings[:author] = User.find_by_login(params[:login]) if params.has_key?(:login)
+    @settings[:category] = IssueCategory.find_by_name(params[:category]) if params.has_key?(:category)
+    @settings[:assign_to] = User.find_by_login(params[:assigned_to]) if params.has_key?(:assigned_to)
+
+    read_local_settings
+    check_custom_field_assignments
+  end
+  
+  def read_local_settings
+    local_settings = AirbrakeServerProjectSettings.find_by_project_id(@settings[:project].id)
+    return if local_settings.nil?
+    [:author, :priority, :reopen_strategy, :tracker, :category, :assign_to, :fixed_version_id].each do |key|
+      @settings[key] = local_settings.send(key.to_s) unless @settings.has_key?(key)
+    end
   end
   
   def create_new_issue
@@ -88,9 +100,9 @@ class AirbrakeController < ApplicationController
     @issue.tracker = @settings[:tracker]
     @issue.project = @settings[:project]
     @issue.category = @settings[:category]
-    @issue.fixed_version_id = @settings[:fixed_version]
-    @issue.assigned_to = @settings[:assigned_to]
-    @issue.priority_id = @settings[:priority] unless @settings[:priority].nil?
+    @issue.fixed_version_id = @settings[:fixed_version_id]
+    @issue.assigned_to = @settings[:assign_to]
+    @issue.priority = @settings[:priority] unless @settings[:priority].nil?
     @issue.description = render_to_string(:partial => 'issue_description')
     @issue.status = issue_status_open
     @issue.custom_values.build(:custom_field => @occurrences_field, :value => '1')
