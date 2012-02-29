@@ -134,7 +134,7 @@ class AirbrakeController < ApplicationController
   end
    
   def build_subject
-    error_class = @notice['error']['class']
+    error_class = @notice['error']['message']
     # if there's only one line, it gets parsed into a hash instead of an array
     if @notice['error']['backtrace']['line'].is_a? Hash
       file = @notice['error']['backtrace']['line']['file']
