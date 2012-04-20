@@ -3,7 +3,7 @@ require 'hpricot'
 class AirbrakeController < ApplicationController
   skip_before_filter :check_if_login_required
   before_filter :find_or_create_custom_fields
-
+  
   unloadable
   
   def index
@@ -12,14 +12,14 @@ class AirbrakeController < ApplicationController
     if (@notice['version'] != "2.0")
       logger.warn("Expected Airbrake notice version 2.0 but got #{@notice['version']}. You should consider filing an enhancement request or updating the plugin.")
     end
-
+    
     restore_var_elements(request.body)
     
     redmine_params = YAML.load(@notice['api_key'])
     raise ArgumentError.new("Invalid API key #{Setting.mail_handler_api_key} != #{redmine_params[:api_key]}") unless Setting.mail_handler_api_key == redmine_params[:api_key]
-
+    
     read_settings(redmine_params)
-
+    
     subject = build_subject
     @issue = Issue.find_by_subject_and_project_id_and_tracker_id(subject, @settings[:project].id, @settings[:tracker].id)
     
@@ -122,7 +122,7 @@ class AirbrakeController < ApplicationController
     environment_name = @notice['server_environment']['environment_name']
     if (['always', environment_name].include?(@settings[:reopen_strategy]))
       @issue.status = issue_status_open if @issue.status.is_closed?
-      @issue.init_journal(@settings[:author], "h4. Issue reopened after occurring again in #{environment_name} environment")
+      @issue.init_journal(@settings[:author], render_to_string(:partial => 'issue_description'))
     end
     number_occurrences = @issue.custom_value_for(@occurrences_field.id).value
     @issue.custom_field_values = { @occurrences_field.id => (number_occurrences.to_i+1).to_s }
@@ -132,7 +132,7 @@ class AirbrakeController < ApplicationController
   def issue_status_open
     IssueStatus.find(:first, :conditions => {:is_default => true}, :order => 'position ASC')
   end
-   
+  
   def build_subject
     error_class = @notice['error']['message']
     # if there's only one line, it gets parsed into a hash instead of an array
