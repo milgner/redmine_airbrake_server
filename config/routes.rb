@@ -1,3 +1,4 @@
-ActionController::Routing::Routes.draw do |map|
-  map.connect '/notifier_api/v2/notices/', :controller => 'airbrake', :action => 'index', :conditions => { :method => :post }
+RedmineApp::Application.routes.draw do
+  match 'projects/:id/settings/airbrake_server', :to => "airbrake_server_project_settings#update"
+  post '/notifier_api/v2/notices/' => 'airbrake#index'
 end

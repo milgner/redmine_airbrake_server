@@ -6,11 +6,11 @@
 <table>
 	<tr>
 		<td><%= f.label 'author_id', l('airbrake.author') %></td>
-		<td><%= f.select 'author_id', @project.members.collect {|u| [ u.name, u.id ] }, {:include_blank => false} %></td>
+		<td><%= f.select 'author_id', @project.members.collect {|u| u.user ? [ u.name, u.id ] : nil}, {:include_blank => false} %></td>
 	</tr>
 	<tr>
 		<td><%= f.label 'assign_to_id', l('airbrake.assign_to') %></td>
-		<td><%= f.select 'assign_to_id', @project.members.collect{|u| [ u.name, u.id ]}, {:include_blank => true} %></td>
+		<td><%= f.select 'assign_to_id', @project.members.collect{|u| u.user ? [ u.name, u.id ] : nil}, {:include_blank => true} %></td>
 	</tr>
 	<tr>
 		<td><%= f.label 'priority_id', l('airbrake.priority') %></td>
