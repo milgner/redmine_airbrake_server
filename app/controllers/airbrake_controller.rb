@@ -143,7 +143,11 @@ class AirbrakeController < ApplicationController
       file = @notice['error']['backtrace']['line'].first()['file']
       line = @notice['error']['backtrace']['line'].first()['number']
     end
-    "[Airbrake] #{error_class} in #{file}:#{line}"[0..254]
+    "[Airbrake] #{build_message_hash} #{error_class} in #{file}:#{line}"[0..254]
+  end
+
+  def build_message_hash
+    Digest::MD5.hexdigest(@notice['error']['message'])[0..7]
   end
   
   def find_or_create_custom_fields

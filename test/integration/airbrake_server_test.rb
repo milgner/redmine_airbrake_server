@@ -57,7 +57,8 @@ EOF
    
   def test_create_new_issues
     i = post_and_find_issue(@@xml_notice_data_full)
-    assert_equal '[Airbrake] RuntimeError in /testapp/app/models/user.rb:53', i.subject
+    # 8b6a2e77 = Digest::MD5.hexdigest("RuntimeError: I've made a huge mistake")[0..7]
+    assert_equal '[Airbrake] 8b6a2e77 RuntimeError in /testapp/app/models/user.rb:53', i.subject
     assert i.description.include?("RuntimeError: I've made a huge mistake")
     assert i.description.include?("/testapp/app/controllers/users_controller.rb")
     assert_equal "production", i.custom_value_for(IssueCustomField.find_by_name('Environment')).value
